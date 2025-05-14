@@ -2,7 +2,8 @@ const path = require("path");
 const fs = require("fs");
 const CopyPlugin = require("copy-webpack-plugin");
 const InjectManifestPlugin = require("./build/chrome");
-const WebpackObfuscator = require("webpack-obfuscator");
+const ObfuscatorPlugin = require("./build/obfuscated"); 
+const TerserPlugin = require('terser-webpack-plugin');
 module.exports = {
     mode: "development",
     entry: {},
@@ -30,22 +31,30 @@ module.exports = {
             srcScripts: "src/assets/scripts",
             manifestPath: "src/manifest.json"
         }),
-        // 配置 webpack-obfuscator 插件
-        new WebpackObfuscator({
-            exclude: /src\/assets\/lib\/.*/,
-            rotateStringArray: true,
-            selfDefending: true,  // 自我防护，避免代码被解读
-            debugProtection: true,  // 禁止调试
-            compact: true,  // 压缩代码
-        }, ['bundledMinify']),
-        function () {
-            this.hooks.done.tap('DonePlugin', (stats) => {
-                // 插件完成后，检查 Webpack 的构建信息
-                console.log('Webpack build done!');
-                console.log('Webpack stats:', stats.toJson());
-            });
-        },
+        new ObfuscatorPlugin({
+            excludeDirs: ['assets/lib']
+           
+          }),
+        
+        
     ],
+
+    optimization: {
+        minimizer: [
+            // 使用 TerserPlugin 对代码进行混淆压缩
+            new TerserPlugin({
+                terserOptions: {
+                    mangle: true, // 启用混淆
+                    compress: {
+                        drop_console: true, // 移除 console
+                    },
+                    output: {
+                        comments: false, // 去除注释
+                    },
+                },
+            }),
+        ],
+    },
 
 
     watch: true,
