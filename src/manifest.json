@@ -1,0 +1,58 @@
+{
+  "manifest_version": 3,
+  "name": "自动投流小助手授权插件（巨量广告）插件",
+  "version": "1.0",
+  "description": "巨量广告授权 插件",
+  "permissions": [
+    "declarativeContent",
+    "browsingData",
+    "webRequest",
+    "activeTab",
+    "tabs",
+    "scripting",
+    "https://business.oceanengine.com/*",
+    "https://*.oceanengine.com/*",
+    "cookies",
+    "storage",
+    "downloads",
+    "clipboardWrite"
+  ],
+  "icons": {
+    "16": "logo.png",
+    "48": "logo.png",
+    "128": "logo.png"
+  },
+  "host_permissions": [
+    "https://business.oceanengine.com/*",
+    "https://*.oceanengine.com/*",
+    "https://oceanengine.com",
+    "https://ad.oceanengine.com"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup/index.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://business.oceanengine.com/*"],
+      "js": [
+        "content-scripts/event/index.js"
+      ],
+      "run_at": "document_start"
+    },
+    {
+      "matches": ["https://business.oceanengine.com/*"],
+      "js": [
+        "content-scripts/oceanengine/index.js"
+      ]
+    }
+  ],
+  "web_accessible_resources": [
+      {
+        "matches": ["https://business.oceanengine.com/*"],
+        "resources": ["assets/localstorage.js"]
+      }
+  ]
+}

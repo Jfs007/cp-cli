@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>弹出窗口</title>
+  </head>
+  <style>
+    body {
+      width: 500px;
+      font-family: PingFangSC-Regular, PingFang SC;
+    }
+
+    body button {
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    body button:first-child {
+      margin-top: 0;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .header {
+      width: 100%;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding: 10px;
+      border-bottom: 1px solid #ccc;
+      position: relative;
+    }
+    .header p {
+      font-size: 16px;
+      font-weight: 700;
+      margin: 0;
+      padding: 0;
+    }
+    .header span {
+      position: absolute;
+      right: 10px;
+    }
+
+    .tips p {
+      font-size: 14px;
+      color: #e9b681;
+      line-height: 25px;
+      margin: 0;
+    }
+
+    .tips .update {
+      /* color: #207efb; */
+      font-size: 14px;
+      font-weight: 600;
+      padding: 10px 0;
+    }
+
+    button {
+      margin: 0 8px;
+      line-height: 32px;
+      min-width: 140px;
+      color: #fff;
+      outline: none;
+      border-color: transparent;
+    }
+
+    .btn button {
+      background-color: #207efb;
+    }
+
+    .msg {
+      display: none;
+    }
+
+    .blue {
+      color: #2092fc !important;
+    }
+
+    .green {
+      color: #23c23f !important;
+    }
+
+    .red {
+      color: #fb2025 !important;
+    }
+    .btn {
+      margin: 20px 0 10px 0;
+    }
+
+    #copy-success,
+    #getAuthCode {
+      display: none;
+    }
+    #copyCode {
+      cursor: pointer;
+    }
+  </style>
+  <script type="application/javascript" src="../assets/lib/jquery.min.js"></script>
+  <body>
+    <div class="container">
+      <div class="header">
+        <p>授权插件</p>
+        <!-- <span>更新时间：2025-01-01</span> -->
+      </div>
+
+      <div class="tips">
+        <p class="update">
+          <a
+            href="https://cdn.itaored.com/prod/others/tools/投流小助手授权插件.zip"
+            target="_blank"
+            >更新插件>></a
+          >
+        </p>
+        <!-- <p>· 同代理ID同快手ID仅需授权一次</p> -->
+        <p>· 同意授权前，请确认平台保持在登录状态</p>
+      </div>
+
+      <!-- <div class="btn">
+        <button id="changeAccount" class="">切换账号</button>
+      </div> -->
+
+      <div class="btn">
+        <button id="getCookie">同意授权</button>
+      </div>
+
+      
+
+      <div id="msg" class="msg green"></div>
+    </div>
+  </body>
+  <script type="application/javascript" src="./index.js"></script>
+</html>
