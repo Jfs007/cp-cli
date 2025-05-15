@@ -1,3 +1,13 @@
+let AppState = {
+    adItaored: {
+
+    },
+    tiktok: {
+
+    }
+
+}
+
 // 通用 fetchData 函数封装
 async function fetchData(url, data = {}) {
     try {
@@ -90,38 +100,17 @@ async function getUserInfo(tab) {
 // 根据域名类型处理逻辑
 async function handleDomain(_cookie) {
     if (!_cookie.user_id) return authError({})
-
     try {
+        authSuccess(_cookie);
+        const { site, token } = AppState.adItaored;
+        setTimeout(() => {
+            if (!token) {
+                window.open(site + 'account/douyin');
+            } else {
+                window.open(site + 'automate/create')
+            }
+        }, 230)
 
-
-
-
-        // if (type === "niu") {
-        //     data = await fetchData("https://niu.e.kuaishou.com/rest/esp/owner/info", {});
-        //     console.log("niu 返回数据: " + JSON.stringify(data));
-        //     params = {...params, type:1, agentId: data.data.specialUser.agentId, userId: data.data.user.userId};
-        // } else if (type === "uc") {
-        //     data = await fetchData("https://uc.e.kuaishou.com/rest/customer/common/ad-info", {
-        //         queryCommonInfoTypeList: ["LOGIN_MODEL"]
-        //     });
-        //     console.log("uc 返回数据: " + JSON.stringify(data));
-        //     params = {...params, type:2, agentId: data.data.loginModel.agentId, userId: data.data.loginModel.userId};
-        // } else if (type === "ks") {
-        //     data = await fetchData("https://agent.e.kuaishou.com/rest/dsp/agent/infov2", {});
-        //     console.log("ks 返回数据: " + JSON.stringify(data));
-        //     params = {...params, type:3,
-        //         agentId: data.data.adDspAgent.agentId,
-        //         agentName: data.data.adDspAgent.agentName,
-        //         userId: data.data.adDspAgent.userId};
-        // } else {
-        //     console.log("未知类型: " + type);
-        //     return;
-        // }
-
-        // 将最终参数上报到目标接口
-        // const response = await fetchData("https://ad.itaored.com/api/iu/ks/saveCookie", params, "POST");
-        // console.log("上报参数：" + JSON.stringify(params) + "，上报结果: " + JSON.stringify(response));
-        authSuccess(_cookie)
     } catch (error) {
         authError(error)
         console.log("处理域名 " + type + " 时出错: " + error.message);
@@ -131,14 +120,19 @@ async function handleDomain(_cookie) {
 // 获取 Cookie 的通用函数
 async function getCookies(paramArr, host) {
     let expire = 10000000000000;
-    const tab = await getCurrentTab();
-    let { user_unique_id } = await getUserInfo(tab)
+    const { user_id } = AppState.tiktok;
+    if (!user_id) {
+        const tab = await getCurrentTab();
+        let { user_unique_id } = await getUserInfo(tab);
+        AppState.tiktok.user_id = user_unique_id;
+    }
+
     const cookies = await Promise.all(paramArr.map(name => {
         return new Promise((resolve, reject) => {
             chrome.cookies.get({ url: host, name: name }, function (cookies) {
                 if (cookies) {
                     if (name === 'trace_log_user_id') {
-                        user_unique_id = cookies.value ? cookies.value : user_unique_id;
+                        AppState.tiktok.user_id = cookies.value ? cookies.value : AppState.tiktok.user_id;
                         resolve(null);
                     } else {
                         expire = Math.min(expire, Math.floor(cookies.expirationDate * 1000))
@@ -154,7 +148,7 @@ async function getCookies(paramArr, host) {
     return {
         value: cookies.filter(cookie => cookie).join("; "),
         expire,
-        user_id: user_unique_id
+        user_id: AppState.tiktok.user_id
 
 
     } // 返回过滤后的 cookies
@@ -179,45 +173,6 @@ async function changeAccount() {
     removeCookie(() => {
         chrome.tabs.reload(tab.id);
     })
-
-
-
-    // const cookieKeys = [
-    //     "csrf_session_id",
-    //     "csrftoken",
-    //     "d_ticket",
-    //     "fg_uid",
-    //     "is_hit_partitioned_cookie_canary",
-    //     "is_hit_partitioned_cookie_canary_ss",
-    //     "is_staff_user",
-    //     "n_mh",
-    //     "odin_tt",
-    //     "passport_csrf_token",
-    //     "passport_csrf_token_default",
-    //     "passport_mfa_token",
-    //     "sessionid",
-    //     "sessionid_ss",
-    //     "sid_guard",
-    //     "sid_tt",
-    //     "sid_ucp_sso_v1",
-    //     "sid_ucp_v1",
-    //     "ssid_ucp_sso_v1",
-    //     "ssid_ucp_v1",
-    //     "sso_uid_tt",
-    //     "sso_uid_tt_ss",
-    //     "toutiao_sso_user",
-    //     "toutiao_sso_user_ss",
-    //     "ttwid",
-    //     "uid_tt",
-    //     "uid_tt_ss",
-    //     "x-jupiter-uuid"
-    // ];
-
-    // cookieKeys.map(async name => await chrome.cookies.remove({
-    //     url: _URL_,
-    //     name: name
-    // }));
-
 }
 
 function setCookies() {
@@ -227,19 +182,97 @@ function setCookies() {
 // JS 监听逻辑
 $(document).ready(function () {
 
+
     // 点击事件监听
     $("#getCookie").click(async function () {
+        const _this = $(this);
+        const text = _this.text();
 
         try {
+            _this.text('授权中...');
             // 获取 Cookie 并拼接成字符串
             const _cookie = await getCookies(paramArr, _URL_);
+            await chromeRedux.commit('APP/SET_TIKTOK_USERINFO', _cookie);
             // 根据类型处理后续逻辑
             await handleDomain(_cookie);
+            _this.text(text);
+
         } catch (error) {
+            _this.text(text);
             console.log("获取 Cookie 或处理逻辑时出错: " + error.message);
         }
     });
     $("#changeAccount").click(async function () {
         changeAccount();
-    })
+    });
+    $('#plugin-options').click(() => {
+        const url = chrome.runtime.getURL('options/index.html');
+        window.open(url, 'options');
+    });
+    async function setup() {
+        const tab = await getCurrentTab();
+        $("#getCookie").hide();
+        $("#changeAccount").hide();
+
+        if (tab.url.indexOf('business.oceanengine.com') < 0) return;
+        try {
+            AppState = await chromeRedux.get('APP') || {};
+            // App.adItaored = appInfo.adItaored;
+            const { site } = AppState.adItaored || {};
+            let { user_unique_id } = await getUserInfo(tab);
+            AppState.tiktok.user_id = user_unique_id;
+            if (!user_unique_id) {
+                return chrome.tabs.reload(tab.id);
+            }
+            chromeRedux.commit('APP/SET_TIKTOK_USERINFO', AppState.tiktok);
+            if (!AppState.adItaored.token) {
+                $("#getCookie").show();
+                return true;
+            }
+            const baseApi = site == 'https://ad.itaored.com/' ? "https://ad.itaored.com/" : "https://testad.itaored.com/"
+            const res = await fetch(`${baseApi}api/media-account/list?accountType=2&channel=4&pageNum=1&pageSize=10`, {
+                method: 'GET',
+                headers: {
+                    "Content-Type": "application/json", // 设置为 JSON 格式,
+                    "accesstoken": AppState.adItaored.token
+                },
+            });
+            const { data } = await res.json() || {};
+            const hasMatch = (data || []).find(({ accountUin }) => {
+                return user_unique_id === accountUin;
+            });
+            if (!hasMatch) {
+                $("#getCookie").hide();
+                $("#changeAccount").show();
+            } else {
+                $("#getCookie").show();
+                $("#changeAccount").hide();
+            }
+
+
+        } catch (error) {
+            console.log(error, 'errro');
+        }
+
+    }
+
+
+    setup();
+
+
+    chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+        if (message.type === 'PAGE_LOADED') {
+            // 处理 Tab 加载完成的事件
+            setup();
+        }
+    });
+
+
+
+
+
+
+
+
+
 });

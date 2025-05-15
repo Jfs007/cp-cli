@@ -1,136 +1,168 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>弹出窗口</title>
-  </head>
-  <style>
-    body {
-      width: 500px;
-      font-family: PingFangSC-Regular, PingFang SC;
-    }
 
-    body button {
-      cursor: pointer;
-      margin-top: 10px;
-    }
+<head>
+  <meta charset="UTF-8" />
+  <title>弹出窗口</title>
+</head>
+<style>
+  html {
+    /* border-radius: 12px; */
+  }
+  body {
+    width: 300px;
+    font-family: PingFangSC-Regular, PingFang SC;
+    margin: 0;
+    padding: 0px;
+    /* border-radius: 12px; */
+    box-sizing: content-box;
+    background-color: rgba(0, 0, 0, 0);
+    overflow: hidden;
 
-    body button:first-child {
-      margin-top: 0;
-    }
+  }
 
-    .container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
 
-    .header {
-      width: 100%;
-      display: flex;
-      align-items: flex-end;
-      justify-content: center;
-      padding: 10px;
-      border-bottom: 1px solid #ccc;
-      position: relative;
-    }
-    .header p {
-      font-size: 16px;
-      font-weight: 700;
-      margin: 0;
-      padding: 0;
-    }
-    .header span {
-      position: absolute;
-      right: 10px;
-    }
+  .container {
+    
+    border-bottom: 1px solid #ccc;
+    position: relative;
+    box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.02);
+    /* border-radius: 12px; */
+    background: linear-gradient(90deg, #E7F1FC 0%, #E7F1FE 100%);
+    position: relative;
+  }
 
-    .tips p {
-      font-size: 14px;
-      color: #e9b681;
-      line-height: 25px;
-      margin: 0;
-    }
+  .container .header {
+    width: 100%;
+    padding: 10px 0;
+    color: #323335;
+  }
 
-    .tips .update {
-      /* color: #207efb; */
-      font-size: 14px;
-      font-weight: 600;
-      padding: 10px 0;
-    }
+  .container .header p {
+    font-size: 14px;
+    font-weight: 500;
 
-    button {
-      margin: 0 8px;
-      line-height: 32px;
-      min-width: 140px;
-      color: #fff;
-      outline: none;
-      border-color: transparent;
-    }
+    margin: 0;
+    padding: 0;
+    text-align: center;
+  }
 
-    .btn button {
-      background-color: #207efb;
-    }
 
-    .msg {
-      display: none;
-    }
+  .container .body {
+    background-color: #fff;
+    width: 100%;
+    padding: 0 10px;
+    box-sizing: border-box;
+    padding-bottom: 20px;
+    /* border-radius: 12px 12px 0 0; */
+  }
 
-    .blue {
-      color: #2092fc !important;
-    }
+  .tips p {
+    font-size: 14px;
+    color: #969aa0;
+    line-height: 25px;
+    margin: 0;
+  }
 
-    .green {
-      color: #23c23f !important;
-    }
+  .tips .update {
+    /* color: #207efb; */
+    font-size: 12px;
+    font-weight: 400;
+    padding: 10px 0;
+    color: #2a55e5;
+    text-align: right;
+  }
 
-    .red {
-      color: #fb2025 !important;
-    }
-    .btn {
-      margin: 20px 0 10px 0;
-    }
+  button {
+    margin: 0 8px;
+    line-height: 32px;
+    min-width: 140px;
+    color: #fff;
+    outline: none;
+    border-color: transparent;
+  }
 
-    #copy-success,
-    #getAuthCode {
-      display: none;
-    }
-    #copyCode {
-      cursor: pointer;
-    }
-  </style>
-  <script type="application/javascript" src="../assets/lib/jquery.min.js"></script>
-  <body>
-    <div class="container">
-      <div class="header">
-        <p>授权插件</p>
-        <!-- <span>更新时间：2025-01-01</span> -->
-      </div>
+
+  .btn button {
+    background-color: #2a55e5;
+  }
+
+  .msg {
+    display: none;
+    text-align: center;
+  }
+
+  .blue {
+    color: #2a55e5 !important;
+  }
+
+  .green {
+    color: #23c23f !important;
+  }
+
+  .red {
+    color: #fb2025 !important;
+  }
+
+  .btn-group {
+    padding: 10px 0;
+    text-align: center;
+  }
+
+  .btn .btn {
+    margin-top: 10px;
+    /* margin: 20px 0 10px 0; */
+  }
+
+  .options-list {
+    cursor: pointer;
+    text-align: center;
+    color: #000;
+  }
+
+  #copy-success,
+  #getAuthCode {
+    display: none;
+  }
+
+  #copyCode {
+    cursor: pointer;
+  }
+</style>
+<script type="application/javascript" src="../assets/lib/jquery.min.js"></script>
+
+<body>
+  <div class="container">
+    <div class="header">
+      <p>授权插件</p>
+      <!-- <span>更新时间：2025-01-01</span> -->
+    </div>
+    <div class="body">
 
       <div class="tips">
         <p class="update">
-          <a
-            href="https://cdn.itaored.com/prod/others/tools/投流小助手授权插件.zip"
-            target="_blank"
-            >更新插件>></a
-          >
+          <a href="https://cdn.itaored.com/prod/others/tools/投流小助手授权插件.zip" target="_blank">更新插件>></a>
         </p>
         <!-- <p>· 同代理ID同快手ID仅需授权一次</p> -->
         <p>· 同意授权前，请确认平台保持在登录状态</p>
       </div>
-
-      <!-- <div class="btn">
-        <button id="changeAccount" class="">切换账号</button>
-      </div> -->
-
-      <div class="btn">
-        <button id="getCookie">同意授权</button>
+      <div class="btn-group">
+        <div class="btn">
+          <button id="changeAccount" class="">切换账号</button>
+        </div>
+       
+        <div class="btn">
+          <button id="getCookie">同意授权</button>
+        </div>
       </div>
-
-      
-
       <div id="msg" class="msg green"></div>
+      <div class="options-list" id="plugin-options">扩展选项</div>
+
     </div>
-  </body>
-  <script type="application/javascript" src="./index.js"></script>
+
+  </div>
+</body>
+<script src="../assets/store.js"></script>
+<script type="application/javascript" src="./index.js"></script>
+
 </html>

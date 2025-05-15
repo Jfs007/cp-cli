@@ -1,4 +1,4 @@
-// "matches"["https://business.oceanengine.com/*"]
+// [matches]["https://business.oceanengine.com/*"]
 !function () {
 
     function changeAccount(e) {

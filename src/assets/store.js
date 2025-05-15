@@ -58,7 +58,6 @@
 
             const res = await chrome.storage.local.get([moduleName]);
             const state = res[moduleName] || { ...mod.state };
-
             mutation(state, payload);
 
             await chrome.storage.local.set({ [moduleName]: state });
@@ -71,16 +70,29 @@
 }();
 
 !function () {
-    // const App = {
-    //     state: {
-          
-    //     },
-    //     mutations: {
-           
-    //     }
-    // }
-    // chromeRedux.registerModule('APP', App);
-    // chromeRedux.init();
+    const App = {
+        state: {
+            adItaored: {
+                token: '',
+                site: "http://localhost:9002/",
+            },
+            tiktok: {
+                value: '',
+                expire: '',
+                user_id: ''
+            }
+        },
+        mutations: {
+            SET_ADITAOREAD_USERINFO(state, payload = {}) {
+                state['adItaored'] = Object.assign(state.adItaored, payload);
+            },
+            SET_TIKTOK_USERINFO(state, payload = {}) {
+                state['tiktok'] = Object.assign(state.tiktok, payload);
+            }
+        }
+    }
+    chromeRedux.registerModule('APP', App);
+    chromeRedux.init();
 }();
 
 
