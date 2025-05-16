@@ -72,7 +72,7 @@
 !function () {
     const App = {
         state: {
-            adItaored: {
+            itaored: {
                 token: '',
                 site: "http://localhost:9002/",
             },
@@ -80,14 +80,32 @@
                 value: '',
                 expire: '',
                 user_id: ''
-            }
+            },
+            authLoss: true
+            
         },
         mutations: {
             SET_ADITAOREAD_USERINFO(state, payload = {}) {
-                state['adItaored'] = Object.assign(state.adItaored, payload);
+                state['itaored'] = Object.assign(state.itaored, payload);
             },
             SET_TIKTOK_USERINFO(state, payload = {}) {
                 state['tiktok'] = Object.assign(state.tiktok, payload);
+            },
+
+            // 退出会清空
+            AUTH(state, payload) {
+                state['itaored'] = Object.assign(state.itaored, payload.itaored || {});
+                state['tiktok'] = Object.assign(state.tiktok, payload.tiktok || {});
+                if(!state['itaored'].token || !state['tiktok'].user_id) { 
+                    state.authLoss = true;
+                    return true;
+                };
+                if(state.authLoss === true) {
+                    console.log('=======发送授权信息=======', payload);
+                    // 提交代码
+                    state.authLoss = false;
+                }
+
             }
         }
     }

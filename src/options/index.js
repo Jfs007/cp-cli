@@ -15,8 +15,7 @@ window.addEventListener('load', () => {
             async function set() {
                 const appInfo = await chromeRedux.get('APP') || {};
                 state.app = appInfo;
-                state.itaoreadUrl = appInfo.adItaored.site;
-                console.log(appInfo, 'appInfo');
+                state.itaoreadUrl = appInfo.itaored.site;
             };
             set();
 

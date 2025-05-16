@@ -1,5 +1,5 @@
 let AppState = {
-    adItaored: {
+    itaored: {
 
     },
     tiktok: {
@@ -66,7 +66,6 @@ function authError(error) {
 function authSuccess(_cookie) {
     document.getElementById("msg").style.display = "block";
     document.getElementById("msg").innerHTML = "授权成功";
-    // console.log(JSON.stringify(_cookie));
     copyText(JSON.stringify(_cookie));
     let successText = document.getElementById("msg");
     successText.setAttribute(
@@ -102,7 +101,7 @@ async function handleDomain(_cookie) {
     if (!_cookie.user_id) return authError({})
     try {
         authSuccess(_cookie);
-        const { site, token } = AppState.adItaored;
+        const { site, token } = AppState.itaored;
         setTimeout(() => {
             if (!token) {
                 window.open(site + 'account/douyin');
@@ -153,36 +152,25 @@ async function getCookies(paramArr, host) {
 
     } // 返回过滤后的 cookies
 }
-// __Garfish__bp-web____tea_cache_tokens_1892
 const _URL_ = 'https://business.oceanengine.com';
 const paramArr = ['sessionid', 'sessionid_ss', 'sid_ucp_sso_v1', 'ssid_ucp_sso_v1', 'uid_tt', 'sid_tt', 'trace_log_user_id'];
 
-const removeCookie = async (handle = () => { }) => {
-    chrome.browsingData.removeCookies({
-        origins: ["https://business.oceanengine.com", "https://oceanengine.com", "https://ad.oceanengine.com", "https://api.feelgood.cn"]
-    }, function () {
-        handle && handle();
-        // chrome.tabs.reload(tab.id);
-    });
-};
-
-
-async function changeAccount() {
-
-    const tab = await getCurrentTab();
-    removeCookie(() => {
-        chrome.tabs.reload(tab.id);
-    })
-}
-
-function setCookies() {
-
-}
-
+// const removeCookie = async (handle = () => { }) => {
+//     chrome.browsingData.removeCookies({
+//         origins: ["https://business.oceanengine.com", "https://oceanengine.com", "https://ad.oceanengine.com", "https://api.feelgood.cn"]
+//     }, function () {
+//         handle && handle();
+//         // chrome.tabs.reload(tab.id);
+//     });
+// };
+// async function changeAccount() {
+//     const tab = await getCurrentTab();
+//     removeCookie(() => {
+//         chrome.tabs.reload(tab.id);
+//     })
+// }
 // JS 监听逻辑
 $(document).ready(function () {
-
-
     // 点击事件监听
     $("#getCookie").click(async function () {
         const _this = $(this);
@@ -202,9 +190,9 @@ $(document).ready(function () {
             console.log("获取 Cookie 或处理逻辑时出错: " + error.message);
         }
     });
-    $("#changeAccount").click(async function () {
-        changeAccount();
-    });
+    // $("#changeAccount").click(async function () {
+    //     changeAccount();
+    // });
     $('#plugin-options').click(() => {
         const url = chrome.runtime.getURL('options/index.html');
         window.open(url, 'options');
@@ -213,50 +201,21 @@ $(document).ready(function () {
         const tab = await getCurrentTab();
         $("#getCookie").hide();
         $("#changeAccount").hide();
-
         if (tab.url.indexOf('business.oceanengine.com') < 0) return;
         try {
             AppState = await chromeRedux.get('APP') || {};
-            // App.adItaored = appInfo.adItaored;
-            const { site } = AppState.adItaored || {};
             let { user_unique_id } = await getUserInfo(tab);
             AppState.tiktok.user_id = user_unique_id;
             if (!user_unique_id) {
                 return chrome.tabs.reload(tab.id);
             }
             chromeRedux.commit('APP/SET_TIKTOK_USERINFO', AppState.tiktok);
-            if (!AppState.adItaored.token) {
-                $("#getCookie").show();
-                return true;
-            }
-            const baseApi = site == 'https://ad.itaored.com/' ? "https://ad.itaored.com/" : "https://testad.itaored.com/"
-            const res = await fetch(`${baseApi}api/media-account/list?accountType=2&channel=4&pageNum=1&pageSize=10`, {
-                method: 'GET',
-                headers: {
-                    "Content-Type": "application/json", // 设置为 JSON 格式,
-                    "accesstoken": AppState.adItaored.token
-                },
-            });
-            const { data } = await res.json() || {};
-            const hasMatch = (data || []).find(({ accountUin }) => {
-                return user_unique_id === accountUin;
-            });
-            if (!hasMatch) {
-                $("#getCookie").hide();
-                $("#changeAccount").show();
-            } else {
-                $("#getCookie").show();
-                $("#changeAccount").hide();
-            }
-
-
+            // 无论是否捞到小助手的token都展示授权按钮
+            $("#getCookie").show();
         } catch (error) {
             console.log(error, 'errro');
         }
-
     }
-
-
     setup();
 
 

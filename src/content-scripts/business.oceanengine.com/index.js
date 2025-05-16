@@ -1,6 +1,6 @@
 // [matches]["https://business.oceanengine.com/*"]
 !function () {
-
+    const { auth } = exports.module;
     function changeAccount(e) {
         e.stopPropagation();
         e.preventDefault();
@@ -11,7 +11,6 @@
                 console.log('Cookie removal response:', response);
             }
         );
-
     }
     function isHeaderUserCardItem(target) {
         return target.className.indexOf('index_header-user-card-layout-item') > -1;
@@ -40,5 +39,28 @@
 
 
     }, true);
+
+    function getUserInfo() {
+        const storage = localStorage.getItem('__Garfish__bp-web____tea_cache_tokens_1892');
+        const { user_unique_id } = JSON.parse(storage || "{}");
+        return { user_unique_id };
+    }
+    
+    auth.doAuth({ host: 'business.oceanengine.com', value: getUserInfo() });
+
+
+
+
+    // onMessage
+    const onMessage = {
+        ROUTE_WATCH: (a, b) => {
+
+        }
+    }
+    window.addEventListener('message', (event) => {
+        const { type, data } = event.data;
+        onMessage[type] && onMessage[type](data);
+    });
+
 
 }()

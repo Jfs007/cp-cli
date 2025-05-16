@@ -113,6 +113,8 @@ class ChromePlugin {
                 resources: scriptPaths,
                 matches: Array.from(allMatches)
             }]);
+
+
             const scripts = [].concat(...manifest.content_scripts || [], ...contentScriptsConfig || [], [{
                 matches: Array.from(allMatches),
                 js: ["assets/load-script.js"],
@@ -120,6 +122,21 @@ class ChromePlugin {
             }]);
 
             manifest["content_scripts"] = uniqueByMatches(scripts);
+            manifest["content_scripts"].map(scripts => {
+                (scripts.matches || []).forEach(match => allMatches.add(match));
+            });
+            const mouduleCode = `window.exports = window.exports || {};
+    window.exports.module = Object.assign({}, window.exports.module || {});`
+            // 添加到构建产物
+            compilation.assets["content-scripts/@module/index.js"] = {
+                source: () => mouduleCode,
+                size: () => mouduleCode.length
+            };
+            manifest["content_scripts"].unshift({
+                matches: Array.from(allMatches),
+                js: ["content-scripts/@module/index.js"],
+                run_at: "document_start"
+            })
 
             // 添加更新后的 manifest 到输出
             const manifestContent = JSON.stringify(manifest, null, 2);

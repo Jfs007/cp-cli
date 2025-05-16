@@ -5,7 +5,6 @@
       const key = localStorage.key(i);
       storage[key] = localStorage.getItem(key);
     }
-    console.log('setset');
     window.postMessage({
       type: 'LOCALSTORAGE:GET',
       value: storage

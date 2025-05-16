@@ -1,4 +1,4 @@
-// [matches]["https://ad.itaored.com/*","https://testad.itaored.com/*","http://localhost:9002/*"]
+// [matches]["https://ad.itaored.com/*","https://testad.itaored.com/*","http://localhost:9002/*", "https://business.oceanengine.com/*"]
 !function () {
     let lastUrl = location.href;
     // 路由变化监听器
@@ -6,8 +6,9 @@
         const check = () => {
             const currentUrl = location.href;
             if (currentUrl !== lastUrl) {
+                const fromUrl = lastUrl;
                 lastUrl = currentUrl;
-                callback(currentUrl);
+                callback({ to: currentUrl, from: fromUrl });
             }
         };
 
