@@ -22,7 +22,7 @@
   },
   "options_page": "options/index.html",
   "host_permissions": [
-    "https://www.baidu.com"
+    "https://www.baidu.com/*"
   ],
   "background": {
     "service_worker": "background.js"

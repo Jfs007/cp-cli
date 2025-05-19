@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "extensionId": "ncbdpnlpefblkgcfiemdpoldpghmmjek",
   "scripts": {
     "dev": "node build/run.js",
     "build": "webpack --mode production --config webpack.config.js"
@@ -17,5 +18,9 @@
     "webpack-cli": "^6.0.1",
     "webpack-dev-server": "^5.2.1",
     "webpack-obfuscator": "^3.5.1"
+  },
+  "dependencies": {
+    "chrome-remote-interface": "^0.33.3",
+    "javascript-obfuscator": "^4.1.1"
   }
 }

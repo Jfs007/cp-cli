@@ -1,8 +1,6 @@
 !function() {
     const chromeRedux = _require('chromeRedux');
     const sayHello = _require('sayHello');
-    
-
     async function main() {
         const AppState = await chromeRedux.get('APP') || {};
         sayHello();
