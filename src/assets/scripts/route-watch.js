@@ -1,4 +1,4 @@
-// [matches]["https://ad.itaored.com/*","https://testad.itaored.com/*","http://localhost:9002/*", "https://business.oceanengine.com/*"]
+// [matches]["https://yourorigin.com/*"]
 !function () {
     let lastUrl = location.href;
     // 路由变化监听器

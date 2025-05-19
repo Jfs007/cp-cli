@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "自动投流小助手授权插件（巨量广告）插件",
+  "name": "插件",
   "version": "1.0",
-  "description": "巨量广告授权 插件",
+  "description": "插件",
   "permissions": [
     "declarativeContent",
     "browsingData",
@@ -10,8 +10,6 @@
     "activeTab",
     "tabs",
     "scripting",
-    "https://business.oceanengine.com/*",
-    "https://*.oceanengine.com/*",
     "cookies",
     "storage",
     "downloads",
@@ -24,10 +22,7 @@
   },
   "options_page": "options/index.html",
   "host_permissions": [
-    "https://business.oceanengine.com/*",
-    "https://*.oceanengine.com/*",
-    "https://oceanengine.com",
-    "https://ad.oceanengine.com"
+    "https://www.baidu.com"
   ],
   "background": {
     "service_worker": "background.js"
@@ -40,9 +35,6 @@
     
   ],
   "web_accessible_resources": [
-      {
-        "matches": ["https://business.oceanengine.com/*"],
-        "resources": ["assets/localstorage.js"]
-      }
+      
   ]
 }

@@ -109,34 +109,51 @@ class ChromePlugin {
                 matches.forEach(m => allMatches.add(m));
             });
 
+
+
             manifest["web_accessible_resources"] = [].concat(manifest.web_accessible_resources || [], [{
                 resources: scriptPaths,
                 matches: Array.from(allMatches)
             }]);
+            const scripts = [].concat(...manifest.content_scripts || [], ...contentScriptsConfig || [],);
+
+            if (Array.from(allMatches).length) {
+                scripts.push({
+                    matches: Array.from(allMatches),
+                    js: ["assets/load-script.js"],
+                    run_at: "document_start"
+                })
+            }
 
 
-            const scripts = [].concat(...manifest.content_scripts || [], ...contentScriptsConfig || [], [{
-                matches: Array.from(allMatches),
-                js: ["assets/load-script.js"],
-                run_at: "document_start"
-            }]);
+
 
             manifest["content_scripts"] = uniqueByMatches(scripts);
             manifest["content_scripts"].map(scripts => {
                 (scripts.matches || []).forEach(match => allMatches.add(match));
             });
             const mouduleCode = `window.exports = window.exports || {};
-    window.exports.module = Object.assign({}, window.exports.module || {});`
+window.exports.module = Object.assign({}, window.exports.module || {});
+window._require = window._require || ((moduleName) => { return window.exports.module[moduleName]; })
+`
+
             // 添加到构建产物
             compilation.assets["content-scripts/@module/index.js"] = {
                 source: () => mouduleCode,
                 size: () => mouduleCode.length
             };
+            // cp_modules;
+            const cpModulesConfig = this.generateCpModulesConfig(Array.from(allMatches));
+            cpModulesConfig.map(config => {
+                manifest["content_scripts"].unshift(config);
+            })
+
             manifest["content_scripts"].unshift({
                 matches: Array.from(allMatches),
                 js: ["content-scripts/@module/index.js"],
                 run_at: "document_start"
-            })
+            });
+
 
             // 添加更新后的 manifest 到输出
             const manifestContent = JSON.stringify(manifest, null, 2);
@@ -148,13 +165,39 @@ class ChromePlugin {
             callback();
         });
     }
+    generateCpModulesConfig(matches = []) {
+        const cpConfigs = [];
+        const cpPath = 'src/cp_modules';
+        const cpModulesDir = path.resolve(process.cwd(), cpPath);
+        // 读取 content-scripts 目录下的子目录
+        const directories = fs.readdirSync(cpModulesDir).filter(file => {
+            return fs.statSync(path.join(cpModulesDir, file)).isDirectory();
+        });
+        directories.forEach(directory => {
+            const indexFile = path.join(cpPath, directory, 'index.js');
+            const indexJsonFile = path.join(cpModulesDir, directory, 'index.json');
+            // 确保 index.js 存在
+            if (fs.existsSync(indexFile)) {
+                let contentScript = {
+                    matches: matches,  // 假设按照目录名生成匹配规则
+                    js: [indexFile.replace('src/', '')],
+                };
+                // 合并 index.json 配置
+                if (fs.existsSync(indexJsonFile)) {
+                    const indexJsonConfig = JSON.parse(fs.readFileSync(indexJsonFile, 'utf-8'));
+                    contentScript = deepMerge(indexJsonConfig, contentScript);
+                }
+                cpConfigs.push(contentScript);
+            }
+        });
+        return cpConfigs;
+    }
+
 
     generateContentScriptsConfig() {
         const contentScriptsConfig = [];
         let { contentScripts } = this.options;
-
         const contentScriptsDir = path.resolve(process.cwd(), contentScripts);
-
         // 读取 content-scripts 目录下的子目录
         const directories = fs.readdirSync(contentScriptsDir).filter(file => {
             return fs.statSync(path.join(contentScriptsDir, file)).isDirectory();
